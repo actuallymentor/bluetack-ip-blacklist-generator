@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate list
-        run: zsh ubuntu-generate-list.sh
+        run: bash ubuntu-generate-list.sh
       
       - name: Commit updated file
         env:
