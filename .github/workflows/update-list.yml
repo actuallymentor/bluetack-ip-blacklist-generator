@@ -1,0 +1,34 @@
+name: Generate and deploy new list
+
+on:
+  schedule:
+    - cron: '30 14 * * *'
+  push:
+    branches:
+      - master
+
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Generate list
+        run: zsh ubuntu-generate-list.sh
+      
+      - name: Commit updated file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_NAME: ${{ github.repository }}
+          USERNAME: ${{ github.repository_owner }}
+        run: |
+          git checkout master
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f docs/*
+          git commit -am "🤖 Automated docs file compilation" || exit 0
+          git remote set-url --push origin https://$USERNAME:$GITHUB_TOKEN@github.com/$REPO_NAME
+          git push
